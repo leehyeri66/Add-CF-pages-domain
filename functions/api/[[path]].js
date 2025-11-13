@@ -27,6 +27,24 @@ export async function onRequest(context){
     const body=await request.json();
     const domainName=body.name;
     
+    // 先获取项目详情，拿到实际的 pages.dev 域名
+    const projectResp=await fetch(`https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects/${projectName}`,{
+      headers:{'Authorization':`Bearer ${pagesToken}`}
+    });
+    const projectData=await projectResp.json();
+    
+    let pagesDevDomain=`${projectName}.pages.dev`;
+    if(projectData.success&&projectData.result){
+      // 从项目信息中获取实际的 subdomain 或 canonical_deployment.url
+      if(projectData.result.subdomain){
+        pagesDevDomain=`${projectData.result.subdomain}.pages.dev`;
+      }else if(projectData.result.canonical_deployment?.url){
+        const urlObj=new URL(projectData.result.canonical_deployment.url);
+        pagesDevDomain=urlObj.hostname;
+      }
+    }
+    
+    // 添加域名到 Pages
     const addResp=await fetch(`https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects/${projectName}/domains`,{
       method:'POST',
       headers:{'Authorization':`Bearer ${pagesToken}`,'Content-Type':'application/json'},
@@ -34,9 +52,11 @@ export async function onRequest(context){
     });
     const addData=await addResp.json();
     
+    // 如果成功且有 Zone Token，创建 DNS
     if(addData.success&&zoneToken){
       const parts=domainName.split('.');
       const parentDomain=parts.slice(-2).join('.');
+      
       const zonesResp=await fetch(`https://api.cloudflare.com/client/v4/zones?name=${parentDomain}`,{
         headers:{'Authorization':`Bearer ${zoneToken}`}
       });
@@ -44,18 +64,21 @@ export async function onRequest(context){
       
       if(zonesData.success&&zonesData.result?.length>0){
         const zoneId=zonesData.result[0].id;
+        
         const dnsResp=await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`,{
           method:'POST',
           headers:{'Authorization':`Bearer ${zoneToken}`,'Content-Type':'application/json'},
           body:JSON.stringify({
             type:'CNAME',
             name:domainName,
-            content:`${projectName}.pages.dev`,
-            proxied:true
+            content:pagesDevDomain,
+            proxied:true,
+            comment:`Auto-created for ${projectName}`
           })
         });
         const dnsData=await dnsResp.json();
         addData.dns_created=dnsData.success;
+        addData.dns_target=pagesDevDomain;
         addData.dns_info=dnsData;
       }
     }
