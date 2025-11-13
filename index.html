@@ -3,176 +3,107 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CF Pages 自定义域名管理（美观版）</title>
+  <title>CF Pages 域名管理</title>
   <style>
     :root{
-      --orange:#F48120;        /* Princeton Orange */
+      --orange:#F48120;
       --orange-dark:#EA700F;
-      --yellow:#FAAD3F;        /* Yellow Orange */
-      --arsenic:#404041;        /* Dark neutral */
-      --white:#ffffff;
-      --bg1: #F7F7F8;
-      --bg-grad: linear-gradient(135deg, var(--orange) 0%, #FA6B1D 60%, var(--orange-dark) 100%);
+      --yellow:#FAAD3F;
+      --arsenic:#404041;
+      --white:#fff;
+      --bg:#F7F7F8;
       --text:#1f2937;
       --muted:#6b7280;
-      --card:#ffffff;
-      --shadow: 0 6px 28px rgba(0,0,0,.08);
+      --card:#fff;
+      --shadow:0 6px 28px rgba(0,0,0,.08);
     }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto;
-      color: var(--text);
-      background: var(--bg-grad);
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto;
+      color:var(--text);
+      background:linear-gradient(135deg,var(--orange) 0%,#FA6B1D 60%,var(--orange-dark) 100%);
     }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 28px;
-    }
-
-    .header {
-      text-align: center;
-      color: var(--white);
-      margin-bottom: 28px;
-    }
-    .header h1 {
-      font-size: 28px;
-      margin: 0 0 6px;
-      letter-spacing: .5px;
-      text-shadow: 0 2px 6px rgba(0,0,0,.25);
-    }
-    .header p {
-      margin: 0;
-      opacity: .95;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 20px 20px;
-      box-shadow: var(--shadow);
-      border: 1px solid #eaeaea;
-    }
-
-    .card-header {
-      display:flex; align-items:center; justify-content:space-between;
-      font-weight: 700; color: var(--arsenic);
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #eef2f7;
-    }
-
-    label { display:block; font-weight: 600; color: #374151; margin-bottom:6px; }
-
-    input, select {
-      width:100%; padding:12px 14px;
-      font-size:14px; border-radius:8px;
-      border:1.5px solid #e2e8f0; background:#fff;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    input:focus, select:focus {
-      outline: none; border-color: var(--orange); box-shadow: 0 0 0 4px rgba(244,129,32,.15);
-    }
-
-    .btn {
-      width:100%; padding:12px 14px; border-radius:8px;
-      border:0; cursor:pointer; font-weight:700; color:white;
-      background: linear-gradient(135deg, var(--orange) 0%, #F59D3B 100%);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .btn.secondary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color:#fff; }
-    .btn.danger { background: linear-gradient(135deg, #f87171 0%, #f43f5e 100%); }
-    .btn:focus { outline: none; }
-
-    .section-title { font-weight:700; color:#374151; margin:0 0 8px; font-size: 16px; }
-
-    .domain-item { display:flex; align-items:center; justify-content:space-between;
-                   padding:10px 12px; border-radius:8px; background:#f9f9f9; margin-bottom:6px;
-                   border:1px solid #eee; }
-    .domain-name { font-weight:600; color:#374151; }
-    .domain-actions { display:flex; gap:8px; }
-    .domain-actions button { padding:6px 12px; font-size:12px; border-radius:6px; border:0; cursor:pointer; }
-    .domain-actions button.danger { background:#f87171; color:white; }
-
-    .output { white-space: pre-wrap; background: #111; color: #e5e7eb; padding:12px; border-radius:8px; min-height: 120px; }
-
-    @media (max-width: 900px){
-      .grid { grid-template-columns: 1fr; }
-    }
-
+    .container{max-width:1000px;margin:0 auto;padding:28px;}
+    .header{text-align:center;color:var(--white);margin-bottom:28px;}
+    .header h1{font-size:28px;margin:0 0 6px;letter-spacing:.5px;text-shadow:0 2px 6px rgba(0,0,0,.25);}
+    .header p{margin:0;opacity:.95;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:var(--shadow);border:1px solid #eaeaea;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;font-weight:700;color:var(--arsenic);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eef2f7;}
+    .section-title{font-weight:700;color:#374151;margin:0 0 12px;font-size:16px;}
+    label{display:block;font-weight:600;color:#374151;margin-bottom:6px;font-size:14px;}
+    input,select{width:100%;padding:12px 14px;font-size:14px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;transition:border-color .2s,box-shadow .2s;}
+    input:focus,select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(244,129,32,.15);}
+    .btn{width:100%;padding:12px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:700;color:white;background:linear-gradient(135deg,var(--orange) 0%,#F59D3B 100%);transition:transform .2s,box-shadow .2s;margin-top:10px;}
+    .btn:hover{transform:translateY(-1px);}
+    .btn.secondary{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);color:#fff;}
+    .btn.danger{background:linear-gradient(135deg,#f87171 0%,#f43f5e 100%);}
+    .btn:focus{outline:none;}
+    .domain-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:#f9f9f9;margin-bottom:6px;border:1px solid #eee;}
+    .domain-name{font-weight:600;color:#374151;}
+    .domain-actions{display:flex;gap:8px;}
+    .domain-actions button{padding:6px 12px;font-size:12px;border-radius:6px;border:0;cursor:pointer;background:#f87171;color:white;}
+    .output{white-space:pre-wrap;background:#111;color:#e5e7eb;padding:12px;border-radius:8px;min-height:120px;font-size:13px;line-height:1.5;}
+    .divider{height:1px;background:#eee;margin:14px 0;}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header" aria-label="Header">
-      <h1>☁️ Cloudflare Pages 自定义域名管理</h1>
-      <p>绑定、查看、维护子域名，一页式界面，美观快速</p>
+    <div class="header">
+      <h1>☁️ Cloudflare Pages 域名管理</h1>
+      <p>快速绑定子域名到 Pages 项目</p>
     </div>
 
-    <div class="card" id="acctCard">
+    <div class="card">
       <div class="section-title">账户信息</div>
       <label>Account ID
-        <input id="accountId" placeholder="请输入 Cloudflare Account ID" />
+        <input id="accountId" placeholder="输入你的 Cloudflare Account ID"/>
       </label>
     </div>
 
     <div class="grid" style="margin-top:6px;">
-      <div class="card" id="projectCard" style="min-height:120px;">
-        <div class="card-header">
-          <span>Pages 项目</span>
-          <span class="status-badge" id="projectStatus" style="display:none;">已加载</span>
-        </div>
-        <div class="row" style="display:flex; gap:10px;">
+      <div class="card">
+        <div class="card-header"><span>Pages 项目</span></div>
+        <div style="display:flex;gap:10px;">
           <select id="projectSelect" style="flex:1;">
             <option value="">-- 先加载项目 --</option>
           </select>
-          <button class="btn secondary" id="loadProjectsBtn" style="flex:0 0 auto; width:auto;">加载项目</button>
+          <button class="btn secondary" id="loadProjectsBtn" style="flex:0 0 auto;width:auto;margin:0;">加载</button>
         </div>
-        <div style="margin-top:12px;">
-          <button class="btn" id="refreshDomainsBtn" style="width:auto; min-width:120px;">刷新当前项目域名</button>
-        </div>
+        <button class="btn" id="refreshDomainsBtn">刷新域名列表</button>
       </div>
 
-      <div class="card" id="domainCard" style="min-height:120px;">
-        <div class="section-title">当前项目绑定的域名</div>
-        <div id="domainList" class="domain-list" aria-label="已绑定域名列表"></div>
-        <div class="divider" style="height:1px; background:#eee; margin:14px 0;"></div>
-
+      <div class="card">
+        <div class="section-title">已绑定域名</div>
+        <div id="domainList"></div>
+        
+        <div class="divider"></div>
+        
         <label>新增域名
-          <input id="addDomainInput" placeholder="如 sub.yourdomain.com" />
+          <input id="addDomainInput" placeholder="例如: sub.hyeri.us.kg"/>
         </label>
-        <button class="btn" id="addDomainBtn" style="margin-top:8px;">添加域名</button>
-
-        <div class="divider" style="height:1px; background:#eee; margin:14px 0;"></div>
-
-        <label>要删除的域名
-          <input id="removeDomainInput" placeholder="如 sub.yourdomain.com" />
+        <button class="btn" id="addDomainBtn">添加域名</button>
+        
+        <div class="divider"></div>
+        
+        <label>删除域名
+          <input id="removeDomainInput" placeholder="例如: sub.hyeri.us.kg"/>
         </label>
-        <button class="btn danger" id="removeDomainBtn" style="margin-top:8px;">删除域名</button>
+        <button class="btn danger" id="removeDomainBtn">删除域名</button>
       </div>
     </div>
 
     <div class="card" style="margin-top:14px;">
-      <div class="section-title">接口输出</div>
-      <pre id="output" class="output" aria-live="polite">等待操作...</pre>
+      <div class="section-title">📡 API 响应</div>
+      <pre id="output" class="output">等待操作...</pre>
     </div>
   </div>
 
   <script>
-    // 前端仅与后端代理交互，后端通过代理调用 Cloudflare API
     const acct = document.getElementById('accountId');
-    const projectCard = document.getElementById('projectCard');
-    const domainCard = document.getElementById('domainCard');
     const projectSelect = document.getElementById('projectSelect');
     const loadProjectsBtn = document.getElementById('loadProjectsBtn');
     const domainList = document.getElementById('domainList');
@@ -183,19 +114,19 @@
     const refreshDomainsBtn = document.getElementById('refreshDomainsBtn');
     const output = document.getElementById('output');
 
-    async function apiCall(path, method='GET', body=null) {
-      output.textContent = '请求中...';
+    async function apiCall(path, method = 'GET', body = null) {
+      output.textContent = '⏳ 请求中...';
       try {
         const resp = await fetch(path, {
           method,
           headers: { 'Content-Type': 'application/json' },
           body: body ? JSON.stringify(body) : null
         });
-        const data = await resp.json().catch(()=>({error:'无效响应'}));
+        const data = await resp.json().catch(() => ({ error: '无效响应' }));
         output.textContent = JSON.stringify(data, null, 2);
         return { ok: resp.ok, data };
       } catch (e) {
-        output.textContent = '错误: ' + e.message;
+        output.textContent = '❌ 错误: ' + e.message;
         return { ok: false, data: null };
       }
     }
@@ -203,68 +134,70 @@
     async function loadProjects() {
       const accountId = (acct.value || '').trim();
       if (!accountId) return alert('请输入 Account ID');
+      
       const res = await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects`);
+      
       if (res.ok && res.data.success) {
         const projects = res.data.result || [];
         projectSelect.innerHTML = projects.map(p => 
           `<option value="${p.name}">${p.name}</option>`
         ).join('');
-        projectCard.querySelector('#projectStatus')?.removeAttribute('style');
+        
         if (projects.length > 0) {
           projectSelect.value = projects[0].name;
-          await loadDomainsForProject(accountId, projects[0].name);
-        } else {
-          domainList.innerHTML = '';
-          domainCard.style.display = 'none';
+          await loadDomains();
         }
-      } else {
-        // 失败信息直接展示
-        output.textContent = JSON.stringify(res.data, null, 2);
-      }
-    }
-
-    async function loadDomainsForProject(accountId, projectName) {
-      const res = await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`);
-      domainList.innerHTML = '';
-      if (res.ok && res.data.success) {
-        const domains = res.data.result || [];
-        if (domains.length === 0) {
-          domainList.innerHTML = '<div style="color:#555">未绑定自定义域名</div>';
-        } else {
-          domains.forEach(d => {
-            const el = document.createElement('div');
-            el.className = 'domain-item';
-            el.innerHTML = `<span class="domain-name">${d.name}</span>
-                            <div class="domain-actions">
-                              <button onclick="confirmAndRemove('${encodeURIComponent(d.name)}')"
-                                      class="danger">删除</button>
-                            </div>`;
-            domainList.appendChild(el);
-          });
-        }
-        domainCard.style.display = 'block';
-      } else {
-        domainCard.style.display = 'none';
       }
     }
 
     async function loadDomains() {
       const accountId = (acct.value || '').trim();
       const projectName = projectSelect.value;
+      
       if (!accountId || !projectName) return;
-      await loadDomainsForProject(accountId, projectName);
+      
+      const res = await apiCall(
+        `/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`
+      );
+      
+      domainList.innerHTML = '';
+      
+      if (res.ok && res.data.success) {
+        const domains = res.data.result || [];
+        
+        if (domains.length === 0) {
+          domainList.innerHTML = '<div style="color:#555;padding:8px;">暂无绑定域名</div>';
+        } else {
+          domains.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'domain-item';
+            el.innerHTML = `
+              <span class="domain-name">${d.name}</span>
+              <div class="domain-actions">
+                <button onclick="confirmAndRemove('${encodeURIComponent(d.name)}')">删除</button>
+              </div>
+            `;
+            domainList.appendChild(el);
+          });
+        }
+      }
     }
 
     window.confirmAndRemove = async function(domainEncoded) {
       const domain = decodeURIComponent(domainEncoded);
-      if (!confirm(`确定要删除域名 ${domain} 吗？`)) return;
+      if (!confirm(`确定删除域名 ${domain}?`)) return;
+      
       const accountId = (acct.value || '').trim();
       const projectName = projectSelect.value;
-      const res = await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`, 'DELETE');
+      
+      const res = await apiCall(
+        `/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,
+        'DELETE'
+      );
+      
       if (res.ok && res.data.success) {
-        await loadDomainsForProject(accountId, projectName);
-      } else {
-        alert('删除失败，请查看输出');
+        await loadDomains();
+        alert('✅ 删除成功');
       }
     };
 
@@ -272,25 +205,52 @@
       const accountId = (acct.value || '').trim();
       const projectName = projectSelect.value;
       const domain = addDomainInput.value.trim();
-      if (!accountId || !projectName || !domain) return alert('请填写完整信息（账户、项目、域名）');
-      const res = await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`, 'POST', { domain });
+      
+      if (!accountId || !projectName || !domain) {
+        return alert('请填写完整信息');
+      }
+      
+      const res = await apiCall(
+        `/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`,
+        'POST',
+        { name: domain }
+      );
+      
       if (res.ok && res.data.success) {
         addDomainInput.value = '';
-        await loadDomainsForProject(accountId, projectName);
+        await loadDomains();
+        alert('✅ 添加成功');
       } else {
-        // 展示错误信息，便于排查
-        output.textContent = JSON.stringify(res.data, null, 2);
+        alert('❌ 添加失败，请查看 API 响应');
+      }
+    });
+
+    removeDomainBtn.addEventListener('click', async () => {
+      const accountId = (acct.value || '').trim();
+      const projectName = projectSelect.value;
+      const domain = removeDomainInput.value.trim();
+      
+      if (!accountId || !projectName || !domain) {
+        return alert('请填写完整信息');
+      }
+      
+      const res = await apiCall(
+        `/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,
+        'DELETE'
+      );
+      
+      if (res.ok && res.data.success) {
+        removeDomainInput.value = '';
+        await loadDomains();
+        alert('✅ 删除成功');
+      } else {
+        alert('❌ 删除失败，请查看 API 响应');
       }
     });
 
     refreshDomainsBtn.addEventListener('click', loadDomains);
-
     loadProjectsBtn.addEventListener('click', loadProjects);
-
-    // 初次加载时若用户已填 Account ID，尝试加载
-    document.addEventListener('DOMContentLoaded', () => {
-      if (acct.value?.trim()) loadProjects();
-    });
+    projectSelect.addEventListener('change', loadDomains);
   </script>
 </body>
 </html>
