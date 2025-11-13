@@ -5,278 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cloudflare Pages 域名管理</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 40px 20px;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh; padding:40px 10px;
     }
-    
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      color: white;
-    }
-    
-    .header h1 {
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .header p {
-      font-size: 16px;
-      opacity: 0.95;
-    }
-    
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-    }
-    
-    .card-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .card-title::before {
-      content: '';
-      width: 4px;
-      height: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 2px;
-    }
-    
-    label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: #555;
-      font-size: 14px;
-    }
-    
-    input, select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      background: #fafafa;
-    }
-    
-    input:focus, select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      background: white;
-    }
-    
-    button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 12px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-    
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    button.danger {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
-    }
-    
-    button.danger:hover {
-      box-shadow: 0 6px 16px rgba(245, 87, 108, 0.4);
-    }
-    
-    button.secondary {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
-    }
-    
-    button.secondary:hover {
-      box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
-    }
-    
-    pre {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 16px;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-all;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-      border: 1px solid #2d2d2d;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .input-group {
-      margin-bottom: 20px;
-    }
-    
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
-      margin: 24px 0;
-    }
-    
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #e8f5e9;
-      color: #2e7d32;
-      margin-left: auto;
-    }
-    
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .header h1 {
-        font-size: 28px;
-      }
-      
-      body {
-        padding: 20px 16px;
-      }
-    }
-    
-    .icon {
-      width: 20px;
-      height: 20px;
-      display: inline-block;
-    }
-    
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .card {
-      animation: fadeIn 0.4s ease-out;
-    }
+    .container {max-width:900px;margin:0 auto;}
+    .header{text-align:center;margin-bottom:36px;color:white;}
+    .header h1{font-size:32px;font-weight:700;margin-bottom:8px;}
+    .header p{font-size:16px;}
+    .card{background:white;border-radius:16px;padding:26px;margin-bottom:20px;box-shadow:0 6px 32px rgba(60,30,90,0.13);}
+    .card-title{font-size:18px;font-weight:600;color:#333;margin-bottom:16px;}
+    label{display:block;font-weight:500;margin-bottom:8px;color:#555;}
+    input,select{width:100%;padding:12px 16px;border:2px solid #dedede;border-radius:8px;font-size:14px;}
+    input:focus,select:focus{border-color:#764ba2;outline:none;}
+    button{width:100%;padding:14px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;}
+    button:hover{background:linear-gradient(135deg,#4a65d6 0%,#62447a 100%);}
+    button.danger{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);}
+    button.danger:hover{background:linear-gradient(135deg,#ab3b6c 0%,#f77062 100%);}
+    button.secondary{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);}
+    .flex-row{display:flex;gap:10px;}
+    .domain-list{margin-top:16px;}
+    .domain-item{background:#f9f8fb;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;margin-bottom:8px;box-shadow:0 2px 8px 0 #eee;}
+    .domain-item span{color:#333}
+    .domain-item button{width:auto;padding: 4px 16px;font-size:13px;margin-top:0;}
+    .hidden{display:none;}
+    pre{background:#1e1e1e;color:#eaeaea;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;}
+    @media(max-width: 650px){.flex-row{flex-direction:column;}}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>☁️ Cloudflare Pages</h1>
-      <p>快速管理自定义域名绑定</p>
+      <h1>☁️ Cloudflare Pages 自定义域名管理</h1>
+      <p>安全管理项目域名绑定</p>
     </div>
-    
     <div class="card">
-      <div class="card-title">账户配置</div>
-      <div class="input-group">
-        <label>Account ID</label>
-        <input type="text" id="accountId" placeholder="输入你的 Cloudflare Account ID" />
-      </div>
+      <label>Account ID <input type="text" id="accountId" placeholder="你的 Cloudflare Account ID" /></label>
     </div>
-
     <div class="card hidden" id="projectSection">
-      <div class="card-title">项目管理</div>
-      <div class="input-group">
-        <label>选择 Pages 项目</label>
-        <select id="projectSelect">
-          <option value="">-- 请先加载项目 --</option>
-        </select>
-      </div>
-      <button class="secondary" onclick="loadProjects()">🔄 加载项目列表</button>
-    </div>
-
-    <div class="grid hidden" id="domainSection">
-      <div class="card">
-        <div class="card-title">✅ 添加域名</div>
-        <div class="input-group">
-          <label>自定义域名</label>
-          <input type="text" id="addDomainInput" placeholder="example.com" />
+      <div class="flex-row">
+        <div style="flex:2">
+          <label>选择 Pages 项目
+            <select id="projectSelect"><option value="">-- 先加载项目 --</option></select>
+          </label>
         </div>
-        <button onclick="addDomain()">添加域名</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🗑️ 删除域名</div>
-        <div class="input-group">
-          <label>要删除的域名</label>
-          <input type="text" id="removeDomainInput" placeholder="example.com" />
+        <div style="flex:1">
+          <button id="loadProjectsBtn" class="secondary">🔄 刷新项目</button>
         </div>
-        <button class="danger" onclick="removeDomain()">删除域名</button>
       </div>
     </div>
-
+    <div class="card hidden" id="domainSection">
+      <div class="card-title">已绑定域名</div>
+      <div id="domainList" class="domain-list"></div>
+      <div class="flex-row" style="margin-top:22px;">
+        <div style="flex:3">
+          <input type="text" id="addDomainInput" placeholder="新域名，如 example.com" />
+        </div>
+        <div style="flex:1">
+          <button id="addDomainBtn">添加域名</button>
+        </div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title">📡 API 响应</div>
       <pre id="output">等待操作...</pre>
     </div>
   </div>
-
   <script>
     const accountIdInput = document.getElementById('accountId');
     const projectSection = document.getElementById('projectSection');
     const domainSection = document.getElementById('domainSection');
     const projectSelect = document.getElementById('projectSelect');
+    const loadProjectsBtn = document.getElementById('loadProjectsBtn');
+    const domainList = document.getElementById('domainList');
     const addDomainInput = document.getElementById('addDomainInput');
-    const removeDomainInput = document.getElementById('removeDomainInput');
+    const addDomainBtn = document.getElementById('addDomainBtn');
     const output = document.getElementById('output');
+
+    let domainsCache = [];
+    let lastSelectedProject = '';
 
     accountIdInput.addEventListener('input', () => {
       if (accountIdInput.value.trim()) {
@@ -288,16 +96,15 @@
     });
 
     async function apiCall(path, method = 'GET', body = null) {
+      output.textContent = '⏳ 请求中...';
       try {
-        output.textContent = '⏳ 请求中...';
-        const opts = {
-          method,
-          headers: { 'Content-Type': 'application/json' }
-        };
+        const opts = { method, headers: { 'Content-Type': 'application/json' }};
         if (body) opts.body = JSON.stringify(body);
-        
         const res = await fetch(path, opts);
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch {
+          data = { error: '非法响应内容', raw: await res.text() };
+        }
         output.textContent = JSON.stringify(data, null, 2);
         return { ok: res.ok, data };
       } catch (e) {
@@ -308,66 +115,82 @@
 
     async function loadProjects() {
       const accountId = accountIdInput.value.trim();
-      if (!accountId) {
-        alert('请输入 Account ID');
-        return;
-      }
-
+      if (!accountId) return alert('请输入 Account ID');
       const result = await apiCall(`/api/accounts/${accountId}/projects`);
       if (result.ok && result.data.success) {
-        const projects = result.data.result || [];
-        if (projects.length === 0) {
-          projectSelect.innerHTML = '<option value="">没有找到项目</option>';
-        } else {
-          projectSelect.innerHTML = projects.map(p => 
-            `<option value="${p.name}">${p.name}</option>`
-          ).join('');
-          domainSection.classList.remove('hidden');
+        const projects = result.data.result ?? [];
+        projectSelect.innerHTML = projects.length === 0 ? '<option>没有项目</option>' : projects.map(
+          p => `<option value="${p.name}">${p.name}</option>`
+        ).join('');
+        projectSection.classList.remove('hidden');
+        if (projects.length > 0) {
+          projectSelect.value = projects[0].name;
+          await loadDomains();
         }
       }
     }
+
+    async function loadDomains() {
+      const accountId = accountIdInput.value.trim();
+      const projectName = projectSelect.value;
+      if (!accountId || !projectName) { domainSection.classList.add('hidden'); return; }
+      const result = await apiCall(`/api/accounts/${accountId}/projects/${projectName}/domains`);
+      domainsCache = [];
+      domainList.innerHTML = '';
+      if (result.ok && result.data?.result) {
+        domainsCache = result.data.result;
+        if (domainsCache.length === 0) {
+          domainList.innerHTML = '<div style="color:#777">暂无自定义域名</div>';
+        } else {
+          domainList.innerHTML = domainsCache.map(d =>
+            `<div class="domain-item">
+              <span>${d.name}</span>
+              <button class="danger" onclick="removeDomain('${d.name}')">删除</button>
+            </div>`
+          ).join('');
+        }
+        domainSection.classList.remove('hidden');
+      } else {
+        domainSection.classList.add('hidden');
+      }
+    }
+
+    projectSelect.addEventListener('change', loadDomains);
+    loadProjectsBtn.addEventListener('click', loadProjects);
+    addDomainBtn.addEventListener('click', addDomain);
 
     async function addDomain() {
       const accountId = accountIdInput.value.trim();
       const projectName = projectSelect.value;
       const domain = addDomainInput.value.trim();
-      
-      if (!accountId || !projectName || !domain) {
-        alert('请填写完整信息');
-        return;
-      }
-
-      const result = await apiCall(`/api/accounts/${accountId}/projects/${projectName}/domains`, 'POST', { 
-        domain_name: domain 
-      });
-      
+      if (!accountId || !projectName || !domain) return alert('请填写完整信息');
+      const result = await apiCall(`/api/accounts/${accountId}/projects/${projectName}/domains`, 'POST', { domain_name: domain });
       if (result.ok && result.data.success) {
         addDomainInput.value = '';
-        alert('✅ 域名添加成功！');
+        await loadDomains();
+        alert('✅ 域名添加成功');
       }
     }
 
-    async function removeDomain() {
+    window.removeDomain = async function(domain) {
       const accountId = accountIdInput.value.trim();
       const projectName = projectSelect.value;
-      const domain = removeDomainInput.value.trim();
-      
-      if (!accountId || !projectName || !domain) {
-        alert('请填写完整信息');
-        return;
-      }
-
-      if (!confirm(`确定要删除域名 ${domain} 吗？`)) {
-        return;
-      }
-
+      if (!accountId || !projectName || !domain) return alert('数据错误');
+      if (!confirm(`确定要删除域名 ${domain} 吗？`)) return;
       const result = await apiCall(`/api/accounts/${accountId}/projects/${projectName}/domains/${domain}`, 'DELETE');
-      
       if (result.ok && result.data.success) {
-        removeDomainInput.value = '';
-        alert('✅ 域名删除成功！');
+        await loadDomains();
+        alert('✅ 删除成功');
       }
-    }
+    };
+
+    // 自动填充与域同步
+    accountIdInput.addEventListener('blur', loadProjects);
+
+    // 页面加载完成自动尝试加载
+    window.addEventListener('DOMContentLoaded', () => {
+      if(accountIdInput.value.trim()) loadProjects();
+    });
   </script>
 </body>
 </html>
