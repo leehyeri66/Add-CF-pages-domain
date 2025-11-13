@@ -1,7 +1,24 @@
 export async function onRequest(context){
-  const{request}=context;
+  const{request,env}=context;
   const url=new URL(request.url);
   const path=url.pathname;
+  
+  // 处理配置保存/加载
+  if(path==='/api/config'){
+    if(request.method==='POST'){
+      const config=await request.json();
+      await env.CONFIG_KV.put('user_config',JSON.stringify(config));
+      return new Response(JSON.stringify({success:true}),{
+        headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}
+      });
+    }else if(request.method==='GET'){
+      const configStr=await env.CONFIG_KV.get('user_config');
+      const config=configStr?JSON.parse(configStr):null;
+      return new Response(JSON.stringify({success:true,config}),{
+        headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}
+      });
+    }
+  }
   
   const pagesToken=request.headers.get('X-Pages-Token');
   const zoneToken=request.headers.get('X-Zone-Token');
@@ -27,23 +44,19 @@ export async function onRequest(context){
     const body=await request.json();
     const domainName=body.name;
     
-    // 获取项目详情
     const projectResp=await fetch(`https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects/${projectName}`,{
       headers:{'Authorization':`Bearer ${pagesToken}`}
     });
     const projectData=await projectResp.json();
     
-    // 获取正确的 Pages 域名（subdomain 已经包含 .pages.dev）
     let pagesDevDomain=`${projectName}.pages.dev`;
     if(projectData.success&&projectData.result?.subdomain){
       pagesDevDomain=projectData.result.subdomain;
-      // 如果 subdomain 不包含 .pages.dev，才加上
       if(!pagesDevDomain.endsWith('.pages.dev')){
         pagesDevDomain+='.pages.dev';
       }
     }
     
-    // 添加域名到 Pages
     const addResp=await fetch(`https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects/${projectName}/domains`,{
       method:'POST',
       headers:{'Authorization':`Bearer ${pagesToken}`,'Content-Type':'application/json'},
@@ -51,7 +64,6 @@ export async function onRequest(context){
     });
     const addData=await addResp.json();
     
-    // 如果成功且有 Zone Token，创建 DNS
     if(addData.success&&zoneToken){
       const parts=domainName.split('.');
       const parentDomain=parts.slice(-2).join('.');
@@ -71,20 +83,18 @@ export async function onRequest(context){
             type:'CNAME',
             name:domainName,
             content:pagesDevDomain,
-            proxied:true,
-            comment:`Auto for ${projectName}`
+            proxied:true
           })
         });
         const dnsData=await dnsResp.json();
         addData.dns_created=dnsData.success;
         addData.dns_target=pagesDevDomain;
-        addData.dns_info=dnsData;
       }
     }
     
     return new Response(JSON.stringify(addData),{
       status:addResp.status,
-      headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*'}
+      headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}
     });
   }
   
@@ -104,7 +114,7 @@ async function proxy(url,method,body,token){
   const data=await resp.json();
   return new Response(JSON.stringify(data),{
     status:resp.status,
-    headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'*'}
+    headers:{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'}
   });
 }
 
