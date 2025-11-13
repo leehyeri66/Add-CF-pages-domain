@@ -255,6 +255,56 @@
       background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
       margin:20px 0;
     }
+    .hidden{
+      display:none;
+    }
+    .login-container{
+      max-width:450px;
+      margin:10vh auto;
+      position:relative;
+      z-index:1;
+    }
+    .login-card{
+      background:var(--glass-bg);
+      backdrop-filter:blur(20px) saturate(180%);
+      -webkit-backdrop-filter:blur(20px) saturate(180%);
+      border-radius:24px;
+      padding:48px 40px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--glass-border);
+      animation:fadeInUp 0.6s ease-out;
+    }
+    .login-header{
+      text-align:center;
+      margin-bottom:32px;
+    }
+    .login-header h2{
+      font-size:32px;
+      font-weight:800;
+      color:#fff;
+      margin:0 0 8px;
+      text-shadow:0 2px 8px rgba(0,0,0,0.15);
+    }
+    .login-header p{
+      color:rgba(255,255,255,0.85);
+      font-size:15px;
+      margin:0;
+    }
+    .error-msg{
+      background:rgba(231,76,60,0.2);
+      border-left:4px solid #e74c3c;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:8px;
+      margin-bottom:16px;
+      font-size:14px;
+      font-weight:500;
+      display:none;
+    }
+    .error-msg.show{
+      display:block;
+      animation:shake 0.5s;
+    }
     @keyframes fadeInDown{
       from{opacity:0;transform:translateY(-20px);}
       to{opacity:1;transform:translateY(0);}
@@ -263,56 +313,138 @@
       from{opacity:0;transform:translateY(20px);}
       to{opacity:1;transform:translateY(0);}
     }
+    @keyframes shake{
+      0%,100%{transform:translateX(0);}
+      25%{transform:translateX(-10px);}
+      75%{transform:translateX(10px);}
+    }
     @media(max-width:900px){
       .grid{grid-template-columns:1fr;}
       .container{padding:24px 16px;}
       .card{padding:24px;}
+      .login-card{padding:32px 24px;}
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>☁️ Cloudflare Pages</h1>
-      <p>域名管理 · 自动创建 DNS 记录 + 配置保存</p>
-    </div>
-    <div class="card">
-      <div class="section-title">🔑 API 配置</div>
-      <div class="info">💾 配置会保存在 KV 中,下次打开自动加载</div>
-      <label>Account ID<input id="accountId" placeholder="你的 Account ID"/></label>
-      <label style="margin-top:14px;">Pages API Token<input id="pagesToken" type="password" placeholder="用于管理 Pages 项目"/></label>
-      <label style="margin-top:14px;">Zone API Token<input id="zoneToken" type="password" placeholder="用于创建 DNS 记录"/></label>
-      <div class="btn-group" style="margin-top:16px;">
-        <button class="btn success" id="saveConfigBtn" style="flex:1;">💾 保存配置</button>
-        <button class="btn secondary" id="loadConfigBtn" style="flex:1;">📥 加载配置</button>
+  <!-- 登录界面 -->
+  <div id="loginScreen" class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>🔐 登录</h2>
+        <p>请输入访问密码</p>
       </div>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <div class="section-title">📦 Pages 项目</div>
-        <div style="display:flex;gap:12px;">
-          <select id="projectSelect" style="flex:1;"><option value="">-- 先加载项目 --</option></select>
-          <button class="btn secondary" id="loadProjectsBtn" style="flex:0 0 auto;width:auto;margin:0;padding:16px 24px;">加载</button>
-        </div>
-        <button class="btn" id="refreshDomainsBtn">🔄 刷新域名</button>
-      </div>
-      <div class="card">
-        <div class="section-title">🌐 已绑定域名</div>
-        <div id="domainList"></div>
-        <div class="divider"></div>
-        <label>新增域名<input id="addDomainInput" placeholder="sub.hyeri.us.kg"/></label>
-        <button class="btn" id="addDomainBtn">➕ 添加域名 + 自动创建DNS</button>
-        <div class="divider"></div>
-        <label>删除域名<input id="removeDomainInput" placeholder="sub.hyeri.us.kg"/></label>
-        <button class="btn danger" id="removeDomainBtn">🗑️ 删除域名</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="section-title">📡 操作日志</div>
-      <pre id="output" class="output">等待操作...</pre>
+      <div id="errorMsg" class="error-msg">密码错误，请重试</div>
+      <label>密码
+        <input type="password" id="loginPassword" placeholder="输入密码" />
+      </label>
+      <button class="btn success" id="loginBtn">🔓 解锁</button>
     </div>
   </div>
+
+  <!-- 主界面 -->
+  <div id="mainScreen" class="hidden">
+    <div class="container">
+      <div class="header">
+        <h1>☁️ Cloudflare Pages</h1>
+        <p>域名管理 · 自动创建 DNS 记录 + 配置保存</p>
+      </div>
+      <div class="card">
+        <div class="section-title">🔑 API 配置</div>
+        <div class="info">💾 配置会保存在 KV 中,下次打开自动加载</div>
+        <label>Account ID<input id="accountId" placeholder="你的 Account ID"/></label>
+        <label style="margin-top:14px;">Pages API Token<input id="pagesToken" type="password" placeholder="用于管理 Pages 项目"/></label>
+        <label style="margin-top:14px;">Zone API Token<input id="zoneToken" type="password" placeholder="用于创建 DNS 记录"/></label>
+        <div class="btn-group" style="margin-top:16px;">
+          <button class="btn success" id="saveConfigBtn" style="flex:1;">💾 保存配置</button>
+          <button class="btn secondary" id="loadConfigBtn" style="flex:1;">📥 加载配置</button>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="section-title">📦 Pages 项目</div>
+          <div style="display:flex;gap:12px;">
+            <select id="projectSelect" style="flex:1;"><option value="">-- 先加载项目 --</option></select>
+            <button class="btn secondary" id="loadProjectsBtn" style="flex:0 0 auto;width:auto;margin:0;padding:16px 24px;">加载</button>
+          </div>
+          <button class="btn" id="refreshDomainsBtn">🔄 刷新域名</button>
+        </div>
+        <div class="card">
+          <div class="section-title">🌐 已绑定域名</div>
+          <div id="domainList"></div>
+          <div class="divider"></div>
+          <label>新增域名<input id="addDomainInput" placeholder="sub.hyeri.us.kg"/></label>
+          <button class="btn" id="addDomainBtn">➕ 添加域名 + 自动创建DNS</button>
+          <div class="divider"></div>
+          <label>删除域名<input id="removeDomainInput" placeholder="sub.hyeri.us.kg"/></label>
+          <button class="btn danger" id="removeDomainBtn">🗑️ 删除域名</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">📡 操作日志</div>
+        <pre id="output" class="output">等待操作...</pre>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // 登录逻辑
+    const loginScreen=document.getElementById('loginScreen');
+    const mainScreen=document.getElementById('mainScreen');
+    const loginPassword=document.getElementById('loginPassword');
+    const loginBtn=document.getElementById('loginBtn');
+    const errorMsg=document.getElementById('errorMsg');
+
+    async function checkLogin(){
+      const password=loginPassword.value.trim();
+      if(!password){
+        showError();
+        return;
+      }
+
+      try{
+        const resp=await fetch('/api/auth',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({password})
+        });
+        const data=await resp.json();
+        
+        if(data.success){
+          sessionStorage.setItem('authenticated','true');
+          showMainScreen();
+        }else{
+          showError();
+        }
+      }catch(e){
+        showError();
+      }
+    }
+
+    function showError(){
+      errorMsg.classList.add('show');
+      loginPassword.value='';
+      loginPassword.focus();
+      setTimeout(()=>errorMsg.classList.remove('show'),3000);
+    }
+
+    function showMainScreen(){
+      loginScreen.classList.add('hidden');
+      mainScreen.classList.remove('hidden');
+      loadConfig();
+    }
+
+    loginBtn.addEventListener('click',checkLogin);
+    loginPassword.addEventListener('keypress',e=>{
+      if(e.key==='Enter')checkLogin();
+    });
+
+    // 检查是否已登录
+    if(sessionStorage.getItem('authenticated')==='true'){
+      showMainScreen();
+    }
+
+    // 原有的主界面逻辑
     const accountId=document.getElementById('accountId');
     const pagesToken=document.getElementById('pagesToken');
     const zoneToken=document.getElementById('zoneToken');
@@ -468,8 +600,6 @@
     projectSelect.addEventListener('change',loadDomains);
     saveConfigBtn.addEventListener('click',saveConfig);
     loadConfigBtn.addEventListener('click',loadConfig);
-
-    window.addEventListener('DOMContentLoaded',loadConfig);
   </script>
 </body>
 </html>
