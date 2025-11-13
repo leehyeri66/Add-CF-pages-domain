@@ -1,9 +1,44 @@
+// 新增：获取所有项目（支持分页）
+async function fetchAllProjects(accountId, token) {
+  let allProjects = [];
+  let page = 1;
+  let hasMore = true;
+  
+  while (hasMore) {
+    const resp = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects?per_page=100&page=${page}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    const data = await resp.json();
+    
+    if (data.success && data.result) {
+      allProjects = allProjects.concat(data.result);
+      
+      const resultInfo = data.result_info;
+      if (resultInfo && resultInfo.total_pages > page) {
+        page++;
+      } else {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
+  }
+  
+  return allProjects;
+}
+
 export async function onRequest(context){
   const{request,env}=context;
   const url=new URL(request.url);
   const path=url.pathname;
   
-  // 处理登录认证
   if(path==='/api/auth'&&request.method==='POST'){
     const body=await request.json();
     const password=body.password;
@@ -21,7 +56,6 @@ export async function onRequest(context){
     }
   }
   
-  // 处理配置保存/加载
   if(path==='/api/config'){
     if(request.method==='POST'){
       const config=await request.json();
@@ -51,7 +85,22 @@ export async function onRequest(context){
   const finalAccId=accountId||accId;
   
   if(!projectName){
-    return await proxy(`https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects`,'GET',null,pagesToken);
+    // 使用新的分页函数获取所有项目
+    const projects = await fetchAllProjects(finalAccId, pagesToken);
+    return new Response(JSON.stringify({
+      success: true,
+      result: projects,
+      result_info: {
+        count: projects.length,
+        total_count: projects.length
+      }
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
   }
   
   if(projectName&&!domain&&request.method==='GET'){
