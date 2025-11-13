@@ -3,34 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CF Pages 域名管理增强版</title>
+  <title>CF Pages 域名管理</title>
   <style>
-    :root{
-      --orange:#F48120;
-      --orange-dark:#EA700F;
-      --yellow:#FAAD3F;
-      --arsenic:#404041;
-      --white:#fff;
-      --bg:#F7F7F8;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --card:#fff;
-      --shadow:0 6px 28px rgba(0,0,0,.08);
-    }
-    *{box-sizing:border-box;}
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto;
-      color:var(--text);
-      background:linear-gradient(135deg,var(--orange) 0%,#FA6B1D 60%,var(--orange-dark) 100%);
-    }
-    .container{max-width:1100px;margin:0 auto;padding:28px;}
+    :root{--orange:#F48120;--orange-dark:#EA700F;--yellow:#FAAD3F;--arsenic:#404041;--white:#fff;--bg:#F7F7F8;--text:#1f2937;--muted:#6b7280;--card:#fff;--shadow:0 6px 28px rgba(0,0,0,.08);}
+    *{box-sizing:border-box;}html,body{height:100%;}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto;color:var(--text);background:linear-gradient(135deg,var(--orange) 0%,#FA6B1D 60%,var(--orange-dark) 100%);}
+    .container{max-width:1000px;margin:0 auto;padding:28px;}
     .header{text-align:center;color:var(--white);margin-bottom:28px;}
     .header h1{font-size:28px;margin:0 0 6px;letter-spacing:.5px;text-shadow:0 2px 6px rgba(0,0,0,.25);}
     .header p{margin:0;opacity:.95;}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:var(--shadow);border:1px solid #eaeaea;margin-bottom:16px;}
+    .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:var(--shadow);border:1px solid #eaeaea;}
     .card-header{display:flex;align-items:center;justify-content:space-between;font-weight:700;color:var(--arsenic);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eef2f7;}
     .section-title{font-weight:700;color:#374151;margin:0 0 12px;font-size:16px;}
     label{display:block;font-weight:600;color:#374151;margin-bottom:6px;font-size:14px;}
@@ -50,247 +33,149 @@
     .domain-actions button{padding:6px 12px;font-size:12px;border-radius:6px;border:0;cursor:pointer;background:#f87171;color:white;}
     .output{white-space:pre-wrap;background:#111;color:#e5e7eb;padding:12px;border-radius:8px;min-height:120px;font-size:13px;line-height:1.5;}
     .divider{height:1px;background:#eee;margin:14px 0;}
-    .info-box{background:#eff6ff;border-left:4px solid #3b82f6;padding:12px;border-radius:6px;font-size:13px;color:#1e40af;margin-bottom:12px;}
+    .info{background:#eff6ff;border-left:4px solid #3b82f6;padding:10px 12px;border-radius:6px;font-size:13px;color:#1e40af;margin-bottom:12px;}
     @media(max-width:900px){.grid{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>☁️ Cloudflare Pages 域名管理增强版</h1>
-      <p>自动创建 DNS 记录 + 域名绑定一步到位</p>
+      <h1>☁️ Cloudflare Pages 域名管理</h1>
+      <p>自动创建 DNS + 域名绑定</p>
     </div>
-
     <div class="card">
-      <div class="section-title">🔑 API 配置</div>
-      <div class="info-box">
-        💡 API Token 需要权限：Account.Cloudflare Pages:Edit + Zone.DNS:Edit
-      </div>
-      <label>Account ID
-        <input id="accountId" placeholder="你的 Cloudflare Account ID"/>
-      </label>
-      <label style="margin-top:12px;">API Token
-        <input id="apiToken" type="password" placeholder="你的 Cloudflare API Token"/>
-      </label>
+      <div class="section-title">账户信息</div>
+      <label>Account ID<input id="accountId" placeholder="Cloudflare Account ID"/></label>
     </div>
-
-    <div class="grid">
+    <div class="grid" style="margin-top:6px;">
       <div class="card">
         <div class="card-header"><span>Pages 项目</span></div>
         <div style="display:flex;gap:10px;">
-          <select id="projectSelect" style="flex:1;">
-            <option value="">-- 先加载项目 --</option>
-          </select>
+          <select id="projectSelect" style="flex:1;"><option value="">-- 先加载项目 --</option></select>
           <button class="btn secondary" id="loadProjectsBtn" style="flex:0 0 auto;width:auto;margin:0;">加载</button>
         </div>
-        <button class="btn" id="refreshDomainsBtn">刷新域名列表</button>
+        <button class="btn" id="refreshDomainsBtn">刷新域名</button>
       </div>
-
       <div class="card">
         <div class="section-title">已绑定域名</div>
         <div id="domainList"></div>
-        
         <div class="divider"></div>
-        
-        <label>新增域名（自动创建 DNS）
-          <input id="addDomainInput" placeholder="例如: sub.hyeri.us.kg"/>
-        </label>
-        <button class="btn" id="addDomainBtn">添加域名 + 创建 DNS</button>
-        
+        <div class="info">💡 添加域名后会自动创建 CNAME 记录</div>
+        <label>新增域名<input id="addDomainInput" placeholder="sub.hyeri.us.kg"/></label>
+        <button class="btn" id="addDomainBtn">添加 + 创建DNS</button>
         <div class="divider"></div>
-        
-        <label>删除域名
-          <input id="removeDomainInput" placeholder="例如: sub.hyeri.us.kg"/>
-        </label>
-        <button class="btn danger" id="removeDomainBtn">删除域名</button>
+        <label>删除域名<input id="removeDomainInput" placeholder="sub.hyeri.us.kg"/></label>
+        <button class="btn danger" id="removeDomainBtn">删除</button>
       </div>
     </div>
-
-    <div class="card">
+    <div class="card" style="margin-top:14px;">
       <div class="section-title">📡 API 响应</div>
       <pre id="output" class="output">等待操作...</pre>
     </div>
   </div>
-
   <script>
-    const accountIdInput = document.getElementById('accountId');
-    const apiTokenInput = document.getElementById('apiToken');
-    const projectSelect = document.getElementById('projectSelect');
-    const loadProjectsBtn = document.getElementById('loadProjectsBtn');
-    const domainList = document.getElementById('domainList');
-    const addDomainInput = document.getElementById('addDomainInput');
-    const addDomainBtn = document.getElementById('addDomainBtn');
-    const removeDomainInput = document.getElementById('removeDomainInput');
-    const removeDomainBtn = document.getElementById('removeDomainBtn');
-    const refreshDomainsBtn = document.getElementById('refreshDomainsBtn');
-    const output = document.getElementById('output');
+    const acct=document.getElementById('accountId');
+    const projectSelect=document.getElementById('projectSelect');
+    const loadProjectsBtn=document.getElementById('loadProjectsBtn');
+    const domainList=document.getElementById('domainList');
+    const addDomainInput=document.getElementById('addDomainInput');
+    const addDomainBtn=document.getElementById('addDomainBtn');
+    const removeDomainInput=document.getElementById('removeDomainInput');
+    const removeDomainBtn=document.getElementById('removeDomainBtn');
+    const refreshDomainsBtn=document.getElementById('refreshDomainsBtn');
+    const output=document.getElementById('output');
 
-    function getConfig() {
-      const accountId = accountIdInput.value.trim();
-      const apiToken = apiTokenInput.value.trim();
-      if (!accountId || !apiToken) {
-        alert('请先填写 Account ID 和 API Token');
-        return null;
-      }
-      return { accountId, apiToken };
-    }
-
-    async function apiCall(path, method = 'GET', body = null) {
-      output.textContent = '⏳ 请求中...';
-      const config = getConfig();
-      if (!config) return { ok: false, data: null };
-
-      try {
-        const resp = await fetch(path, {
-          method,
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-Account-Id': config.accountId,
-            'X-Api-Token': config.apiToken
-          },
-          body: body ? JSON.stringify(body) : null
-        });
-        const data = await resp.json().catch(() => ({ error: '无效响应' }));
-        output.textContent = JSON.stringify(data, null, 2);
-        return { ok: resp.ok, data };
-      } catch (e) {
-        output.textContent = '❌ 错误: ' + e.message;
-        return { ok: false, data: null };
+    async function apiCall(path,method='GET',body=null){
+      output.textContent='请求中...';
+      try{
+        const resp=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):null});
+        const data=await resp.json().catch(()=>({error:'无效响应'}));
+        output.textContent=JSON.stringify(data,null,2);
+        return{ok:resp.ok,data};
+      }catch(e){
+        output.textContent='错误: '+e.message;
+        return{ok:false,data:null};
       }
     }
 
-    async function loadProjects() {
-      const config = getConfig();
-      if (!config) return;
-      
-      const res = await apiCall(`/api/accounts/${encodeURIComponent(config.accountId)}/projects`);
-      
-      if (res.ok && res.data.success) {
-        const projects = res.data.result || [];
-        projectSelect.innerHTML = projects.map(p => 
-          `<option value="${p.name}">${p.name}</option>`
-        ).join('');
-        
-        if (projects.length > 0) {
-          projectSelect.value = projects[0].name;
+    async function loadProjects(){
+      const accountId=(acct.value||'').trim();
+      if(!accountId)return alert('请输入 Account ID');
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects`);
+      if(res.ok&&res.data.success){
+        const projects=res.data.result||[];
+        projectSelect.innerHTML=projects.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+        if(projects.length>0){
+          projectSelect.value=projects[0].name;
           await loadDomains();
         }
       }
     }
 
-    async function loadDomains() {
-      const config = getConfig();
-      if (!config) return;
-      const projectName = projectSelect.value;
-      if (!projectName) return;
-      
-      const res = await apiCall(
-        `/api/accounts/${encodeURIComponent(config.accountId)}/projects/${encodeURIComponent(projectName)}/domains`
-      );
-      
-      domainList.innerHTML = '';
-      
-      if (res.ok && res.data.success) {
-        const domains = res.data.result || [];
-        
-        if (domains.length === 0) {
-          domainList.innerHTML = '<div style="color:#555;padding:8px;">暂无绑定域名</div>';
-        } else {
-          domains.forEach(d => {
-            const statusClass = d.status === 'active' ? 'status-active' : 'status-pending';
-            const statusText = d.status === 'active' ? '✓ 已激活' : '⏳ 验证中';
-            
-            const el = document.createElement('div');
-            el.className = 'domain-item';
-            el.innerHTML = `
-              <span class="domain-name">${d.name}</span>
-              <span class="domain-status ${statusClass}">${statusText}</span>
-              <div class="domain-actions">
-                <button onclick="confirmAndRemove('${encodeURIComponent(d.name)}')">删除</button>
-              </div>
-            `;
+    async function loadDomains(){
+      const accountId=(acct.value||'').trim();
+      const projectName=projectSelect.value;
+      if(!accountId||!projectName)return;
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`);
+      domainList.innerHTML='';
+      if(res.ok&&res.data.success){
+        const domains=res.data.result||[];
+        if(domains.length===0){
+          domainList.innerHTML='<div style="color:#555;padding:8px;">暂无域名</div>';
+        }else{
+          domains.forEach(d=>{
+            const statusClass=d.status==='active'?'status-active':'status-pending';
+            const statusText=d.status==='active'?'✓ 激活':'⏳ 验证中';
+            const el=document.createElement('div');
+            el.className='domain-item';
+            el.innerHTML=`<span class="domain-name">${d.name}</span><span class="domain-status ${statusClass}">${statusText}</span><div class="domain-actions"><button onclick="confirmAndRemove('${encodeURIComponent(d.name)}')">删除</button></div>`;
             domainList.appendChild(el);
           });
         }
       }
     }
 
-    window.confirmAndRemove = async function(domainEncoded) {
-      const domain = decodeURIComponent(domainEncoded);
-      if (!confirm(`确定删除域名 ${domain}?`)) return;
-      
-      const config = getConfig();
-      if (!config) return;
-      const projectName = projectSelect.value;
-      
-      const res = await apiCall(
-        `/api/accounts/${encodeURIComponent(config.accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,
-        'DELETE'
-      );
-      
-      if (res.ok && res.data.success) {
+    window.confirmAndRemove=async function(domainEncoded){
+      const domain=decodeURIComponent(domainEncoded);
+      if(!confirm(`确定删除 ${domain}?`))return;
+      const accountId=(acct.value||'').trim();
+      const projectName=projectSelect.value;
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,'DELETE');
+      if(res.ok&&res.data.success){
         await loadDomains();
-        alert('✅ 删除成功');
+        alert('删除成功');
       }
     };
 
-    addDomainBtn.addEventListener('click', async () => {
-      const config = getConfig();
-      if (!config) return;
-      
-      const projectName = projectSelect.value;
-      const domain = addDomainInput.value.trim();
-      
-      if (!projectName || !domain) {
-        return alert('请填写完整信息');
-      }
-      
-      const res = await apiCall(
-        `/api/accounts/${encodeURIComponent(config.accountId)}/projects/${encodeURIComponent(projectName)}/domains`,
-        'POST',
-        { 
-          name: domain,
-          create_dns: true
-        }
-      );
-      
-      if (res.ok && res.data.success) {
-        addDomainInput.value = '';
+    addDomainBtn.addEventListener('click',async()=>{
+      const accountId=(acct.value||'').trim();
+      const projectName=projectSelect.value;
+      const domain=addDomainInput.value.trim();
+      if(!accountId||!projectName||!domain)return alert('请填写完整');
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains`,'POST',{name:domain,auto_dns:true});
+      if(res.ok&&res.data.success){
+        addDomainInput.value='';
         await loadDomains();
-        alert('✅ 域名添加成功！DNS 记录已自动创建');
-      } else {
-        alert('❌ 操作失败，请查看 API 响应');
+        alert(res.data.dns_created?'✅ 域名和DNS都创建成功':'✅ 域名创建成功');
       }
     });
 
-    removeDomainBtn.addEventListener('click', async () => {
-      const config = getConfig();
-      if (!config) return;
-      
-      const projectName = projectSelect.value;
-      const domain = removeDomainInput.value.trim();
-      
-      if (!projectName || !domain) {
-        return alert('请填写完整信息');
-      }
-      
-      const res = await apiCall(
-        `/api/accounts/${encodeURIComponent(config.accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,
-        'DELETE'
-      );
-      
-      if (res.ok && res.data.success) {
-        removeDomainInput.value = '';
+    removeDomainBtn.addEventListener('click',async()=>{
+      const accountId=(acct.value||'').trim();
+      const projectName=projectSelect.value;
+      const domain=removeDomainInput.value.trim();
+      if(!accountId||!projectName||!domain)return alert('请填写完整');
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(accountId)}/projects/${encodeURIComponent(projectName)}/domains/${domain}`,'DELETE');
+      if(res.ok&&res.data.success){
+        removeDomainInput.value='';
         await loadDomains();
-        alert('✅ 删除成功');
-      } else {
-        alert('❌ 删除失败，请查看 API 响应');
+        alert('删除成功');
       }
     });
 
-    refreshDomainsBtn.addEventListener('click', loadDomains);
-    loadProjectsBtn.addEventListener('click', loadProjects);
-    projectSelect.addEventListener('change', loadDomains);
+    refreshDomainsBtn.addEventListener('click',loadDomains);
+    loadProjectsBtn.addEventListener('click',loadProjects);
+    projectSelect.addEventListener('change',loadDomains);
   </script>
 </body>
 </html>
