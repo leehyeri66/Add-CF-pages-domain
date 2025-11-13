@@ -48,14 +48,57 @@ export async function onRequest(context){
   const[,accId,projectName,domain]=match;
   const finalAccId=accountId||accId;
   
-  // 获取项目列表 - 简化版，一次性获取100个
+  // 获取所有项目（支持分页）
   if(!projectName){
-    return await proxy(
-      `https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects?per_page=100`,
-      'GET',
-      null,
-      pagesToken
-    );
+    let allProjects = [];
+    let page = 1;
+    let hasMore = true;
+    
+    while(hasMore){
+      try{
+        const resp = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${finalAccId}/pages/projects?page=${page}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${pagesToken}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        const data = await resp.json();
+        
+        if(data.success && data.result && data.result.length > 0){
+          allProjects = allProjects.concat(data.result);
+          
+          // 检查是否还有下一页
+          if(data.result_info && data.result_info.total_pages > page){
+            page++;
+          }else{
+            hasMore = false;
+          }
+        }else{
+          hasMore = false;
+        }
+      }catch(e){
+        hasMore = false;
+      }
+    }
+    
+    return new Response(JSON.stringify({
+      success: true,
+      result: allProjects,
+      result_info: {
+        count: allProjects.length,
+        total_count: allProjects.length
+      }
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
   }
   
   if(projectName&&!domain&&request.method==='GET'){
