@@ -51,7 +51,7 @@ export async function onRequest(context) {
     const [, accId, projectName, domain] = match;
     const finalAccId = accountId || accId;
 
-    // 获取所有项目（支持分页）
+    // 获取所有项目
     if (!projectName) {
         let allProjects = [];
         let page = 1;
@@ -112,7 +112,7 @@ export async function onRequest(context) {
         );
     }
 
-    // 添加域名 + DNS 记录
+    // 添加域名 + DNS 记录（修复版）
     if (projectName && !domain && request.method === 'POST') {
         const body = await request.json();
         const domainName = body.name;
@@ -149,15 +149,23 @@ export async function onRequest(context) {
 
         // 创建 DNS 记录
         if (addData.success) {
-            const parts = domainName.split('.');
-            const parentDomain = parts.slice(-2).join('.');
+            // 🔥 关键修复：智能解析父域名
+            const parentDomain = await findParentZone(domainName, zoneToken, env);
+            
+            if (!parentDomain) {
+                addData.dns_created = false;
+                addData.dns_error = '无法找到匹配的 Zone';
+                return new Response(JSON.stringify(addData), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+                });
+            }
 
             // 从 KV 获取该域名对应的 Zone Token
             let effectiveZoneToken = zoneToken;
             const configStr = await env.CONFIG_KV.get('user_config');
             if (configStr) {
                 const config = JSON.parse(configStr);
-                // 检查配置中是否有该域名的专属 Zone Token
                 if (config.zones && config.zones[parentDomain]) {
                     effectiveZoneToken = config.zones[parentDomain].token;
                 }
@@ -205,6 +213,7 @@ export async function onRequest(context) {
                             addData.dns_updated = updateData.success;
                             addData.dns_target = pagesDevDomain;
                             addData.dns_record_id = recordId;
+                            addData.parent_zone = parentDomain;
                         } else {
                             // 创建新记录
                             const dnsResp = await fetch(
@@ -219,13 +228,15 @@ export async function onRequest(context) {
                                         type: 'CNAME',
                                         name: domainName,
                                         content: pagesDevDomain,
-                                        proxied: true
+                                        proxied: true,
+                                        ttl: 1
                                     })
                                 }
                             );
                             const dnsData = await dnsResp.json();
                             addData.dns_created = dnsData.success;
                             addData.dns_target = pagesDevDomain;
+                            addData.parent_zone = parentDomain;
                             addData.dns_error = dnsData.success ? null : dnsData.errors;
                         }
                     } else {
@@ -261,52 +272,52 @@ export async function onRequest(context) {
         const deleteData = await deleteResp.json();
 
         if (deleteData.success) {
-            const parts = domain.split('.');
-            const parentDomain = parts.slice(-2).join('.');
-
-            // 从 KV 获取该域名对应的 Zone Token
-            let effectiveZoneToken = zoneToken;
-            const configStr = await env.CONFIG_KV.get('user_config');
-            if (configStr) {
-                const config = JSON.parse(configStr);
-                if (config.zones && config.zones[parentDomain]) {
-                    effectiveZoneToken = config.zones[parentDomain].token;
+            const parentDomain = await findParentZone(domain, zoneToken, env);
+            
+            if (parentDomain) {
+                let effectiveZoneToken = zoneToken;
+                const configStr = await env.CONFIG_KV.get('user_config');
+                if (configStr) {
+                    const config = JSON.parse(configStr);
+                    if (config.zones && config.zones[parentDomain]) {
+                        effectiveZoneToken = config.zones[parentDomain].token;
+                    }
                 }
-            }
 
-            if (effectiveZoneToken) {
-                try {
-                    const zonesResp = await fetch(
-                        `https://api.cloudflare.com/client/v4/zones?name=${parentDomain}`,
-                        { headers: { 'Authorization': `Bearer ${effectiveZoneToken}` } }
-                    );
-                    const zonesData = await zonesResp.json();
-
-                    if (zonesData.success && zonesData.result?.length > 0) {
-                        const zoneId = zonesData.result[0].id;
-
-                        const dnsListResp = await fetch(
-                            `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?type=CNAME&name=${domain}`,
+                if (effectiveZoneToken) {
+                    try {
+                        const zonesResp = await fetch(
+                            `https://api.cloudflare.com/client/v4/zones?name=${parentDomain}`,
                             { headers: { 'Authorization': `Bearer ${effectiveZoneToken}` } }
                         );
-                        const dnsListData = await dnsListResp.json();
+                        const zonesData = await zonesResp.json();
 
-                        if (dnsListData.success && dnsListData.result?.length > 0) {
-                            const recordId = dnsListData.result[0].id;
-                            const deleteDnsResp = await fetch(
-                                `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${recordId}`,
-                                {
-                                    method: 'DELETE',
-                                    headers: { 'Authorization': `Bearer ${effectiveZoneToken}` }
-                                }
+                        if (zonesData.success && zonesData.result?.length > 0) {
+                            const zoneId = zonesData.result[0].id;
+
+                            const dnsListResp = await fetch(
+                                `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?type=CNAME&name=${domain}`,
+                                { headers: { 'Authorization': `Bearer ${effectiveZoneToken}` } }
                             );
-                            const deleteDnsData = await deleteDnsResp.json();
-                            deleteData.dns_deleted = deleteDnsData.success;
+                            const dnsListData = await dnsListResp.json();
+
+                            if (dnsListData.success && dnsListData.result?.length > 0) {
+                                const recordId = dnsListData.result[0].id;
+                                const deleteDnsResp = await fetch(
+                                    `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${recordId}`,
+                                    {
+                                        method: 'DELETE',
+                                        headers: { 'Authorization': `Bearer ${effectiveZoneToken}` }
+                                    }
+                                );
+                                const deleteDnsData = await deleteDnsResp.json();
+                                deleteData.dns_deleted = deleteDnsData.success;
+                            }
                         }
+                    } catch (e) {
+                        deleteData.dns_deleted = false;
+                        deleteData.dns_error = e.message;
                     }
-                } catch (e) {
-                    deleteData.dns_deleted = false;
-                    deleteData.dns_error = e.message;
                 }
             }
         }
@@ -318,6 +329,48 @@ export async function onRequest(context) {
     }
 
     return jsonErr('无效操作', 400);
+}
+
+// 🔥 新增：智能查找父 Zone
+async function findParentZone(domainName, zoneToken, env) {
+    // 先尝试从 KV 配置中查找
+    const configStr = await env.CONFIG_KV.get('user_config');
+    if (configStr) {
+        const config = JSON.parse(configStr);
+        if (config.zones) {
+            const configuredZones = Object.keys(config.zones);
+            // 从最长的域名开始匹配（例如 hyeri.us.kg 优先于 us.kg）
+            const sorted = configuredZones.sort((a, b) => b.length - a.length);
+            for (const zone of sorted) {
+                if (domainName === zone || domainName.endsWith('.' + zone)) {
+                    return zone;
+                }
+            }
+        }
+    }
+
+    // 如果 KV 中没有，尝试通过 API 查找
+    if (zoneToken) {
+        try {
+            const resp = await fetch(
+                `https://api.cloudflare.com/client/v4/zones`,
+                { headers: { 'Authorization': `Bearer ${zoneToken}` } }
+            );
+            const data = await resp.json();
+            if (data.success && data.result) {
+                const zones = data.result.map(z => z.name).sort((a, b) => b.length - a.length);
+                for (const zone of zones) {
+                    if (domainName === zone || domainName.endsWith('.' + zone)) {
+                        return zone;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('查找 Zone 失败:', e);
+        }
+    }
+
+    return null;
 }
 
 async function proxy(url, method, body, token) {
