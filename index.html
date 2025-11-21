@@ -7,52 +7,52 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* macOS Big Sur Palette - Light */
-      --bg-gradient-1: #ff9a9e;
-      --bg-gradient-2: #fad0c4;
-      --bg-gradient-3: #a18cd1;
-      --bg-gradient-4: #fbc2eb;
-      
-      --glass-sidebar: rgba(255, 255, 255, 0.6);
+      /* macOS 风格静态配色 - 浅色 (护眼蓝) */
+      --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      --bg-overlay: radial-gradient(circle at 10% 20%, rgba(216, 235, 255, 0.6) 0%, transparent 20%), 
+                    radial-gradient(circle at 90% 80%, rgba(220, 210, 255, 0.6) 0%, transparent 20%);
+
+      --glass-sidebar: rgba(255, 255, 255, 0.65);
       --glass-content: rgba(255, 255, 255, 0.85);
-      --glass-border: rgba(255, 255, 255, 0.4);
+      --glass-border: rgba(0, 0, 0, 0.05);
       
-      --text-primary: #000000;
-      --text-secondary: rgba(60, 60, 67, 0.6);
+      --text-primary: #1d1d1f;
+      --text-secondary: #86868b;
       
-      --input-bg: rgba(255, 255, 255, 0.5);
+      --input-bg: rgba(0, 0, 0, 0.03);
       --input-border: rgba(0, 0, 0, 0.1);
+      --input-focus: #0071e3;
       
-      --accent-color: #007AFF; /* System Blue */
-      --danger-color: #FF3B30;
-      --success-color: #34C759;
+      --accent-color: #0071e3;
+      --danger-color: #ff3b30;
+      --success-color: #34c759;
       
-      --shadow-window: 0 20px 50px rgba(0,0,0,0.15);
-      --radius-window: 24px;
-      --radius-element: 12px;
+      --shadow-window: 0 24px 48px rgba(0, 0, 0, 0.12);
+      --radius-window: 18px;
+      --radius-element: 10px;
     }
 
     [data-theme="dark"] {
-      /* macOS Big Sur Palette - Dark */
-      --bg-gradient-1: #0f2027;
-      --bg-gradient-2: #203a43;
-      --bg-gradient-3: #2c5364;
-      --bg-gradient-4: #4b6cb7;
+      /* macOS 风格静态配色 - 深色 (午夜灰) */
+      --bg-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+      --bg-overlay: radial-gradient(circle at 50% 0%, rgba(50, 70, 90, 0.4) 0%, transparent 60%);
 
-      --glass-sidebar: rgba(30, 30, 30, 0.6);
-      --glass-content: rgba(40, 40, 40, 0.7);
+      --glass-sidebar: rgba(40, 40, 40, 0.6);
+      --glass-content: rgba(30, 30, 30, 0.6);
       --glass-border: rgba(255, 255, 255, 0.1);
 
-      --text-primary: #FFFFFF;
-      --text-secondary: rgba(235, 235, 245, 0.6);
+      --text-primary: #f5f5f7;
+      --text-secondary: #86868b;
 
-      --input-bg: rgba(0, 0, 0, 0.2);
-      --input-border: rgba(255, 255, 255, 0.1);
+      --input-bg: rgba(255, 255, 255, 0.08);
+      --input-border: transparent;
+      --input-focus: #2997ff;
       
-      --shadow-window: 0 20px 50px rgba(0,0,0,0.5);
+      --accent-color: #2997ff;
+      --shadow-window: 0 40px 80px rgba(0, 0, 0, 0.5);
     }
 
-    * { box-sizing: border-box; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+    * { box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -62,190 +62,208 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(-45deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3), var(--bg-gradient-4));
-      background-size: 400% 400%;
-      animation: aurora 15s ease infinite;
+      /* 静态背景，不再闪烁 */
+      background: var(--bg-gradient);
+      position: relative;
       color: var(--text-primary);
-      overflow-x: hidden;
+      overflow: hidden;
+    }
+    
+    /* 添加一层淡淡的光晕，增加质感但不刺眼 */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-overlay);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    @keyframes aurora {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* macOS 窗口风格容器 */
+    /* 主窗口 */
     .app-window {
-      width: 90%;
-      max-width: 1200px;
+      width: 92%;
+      max-width: 1100px;
       height: 85vh;
-      max-height: 900px;
+      max-height: 850px;
       display: flex;
-      background: transparent;
+      /* 强磨砂玻璃效果 */
+      background: var(--glass-sidebar);
+      backdrop-filter: blur(50px) saturate(180%);
+      -webkit-backdrop-filter: blur(50px) saturate(180%);
       border-radius: var(--radius-window);
       box-shadow: var(--shadow-window);
-      overflow: hidden;
+      border: 1px solid var(--glass-border);
       position: relative;
       z-index: 10;
-      border: 1px solid var(--glass-border);
-      flex-direction: row; /* 默认桌面端横向 */
-      animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      flex-direction: row;
+      opacity: 0;
+      transform: scale(0.98);
+      animation: openWindow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
-    /* 左侧边栏 (Sidebar) */
+    @keyframes openWindow {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* 左侧边栏 */
     .sidebar {
-      width: 320px;
-      background: var(--glass-sidebar);
-      backdrop-filter: blur(30px) saturate(120%);
-      -webkit-backdrop-filter: blur(30px) saturate(120%);
+      width: 280px;
+      background: rgba(255,255,255,0.02); /* 极淡的叠加 */
       border-right: 1px solid var(--glass-border);
-      padding: 24px;
+      padding: 28px 20px;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
       flex-shrink: 0;
     }
 
-    /* 右侧内容区 (Content) */
+    /* 右侧内容 */
     .content-area {
       flex: 1;
       background: var(--glass-content);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-      padding: 32px 40px;
+      padding: 40px 50px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
 
-    /* 标题栏 */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 30px;
-    }
-    
-    .brand {
+    /* 品牌区 */
+    .brand-area {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: -0.5px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--glass-border);
     }
 
-    .brand img {
-      width: 36px;
-      height: 36px;
+    .brand-icon {
+      width: 40px;
+      height: 40px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      object-fit: cover;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
-    /* 主题切换按钮 */
-    .theme-btn {
-      background: var(--input-bg);
-      border: 1px solid var(--glass-border);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-
-    /* Section 样式 */
-    .section-title {
-      font-size: 12px;
+    .brand-text {
       font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      margin-top: 24px;
+      font-size: 18px;
+      color: var(--text-primary);
     }
-    .section-title:first-child { margin-top: 0; }
 
-    /* 输入框与表单 */
+    /* 控件样式 */
+    .control-group { margin-bottom: 16px; }
+
     label {
       display: block;
-      font-size: 13px;
-      margin-bottom: 6px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-secondary);
+      margin-bottom: 6px;
+      padding-left: 2px;
     }
 
     input, select {
       width: 100%;
       padding: 10px 12px;
-      font-size: 14px;
-      border-radius: 8px;
+      font-size: 13px;
+      border-radius: var(--radius-element);
       border: 1px solid var(--input-border);
       background: var(--input-bg);
       color: var(--text-primary);
-      margin-bottom: 12px;
       outline: none;
       font-family: inherit;
+      transition: all 0.2s;
     }
     
     input:focus, select:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+      background: var(--input-bg);
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+    }
+
+    /* 侧边栏底部工具 */
+    .sidebar-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 15px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .theme-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 5px;
+      border-radius: 6px;
+      transition: color 0.2s;
+    }
+    .theme-btn:hover { color: var(--text-primary); background: var(--input-bg); }
+
+    /* 主内容标题 */
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .content-header h2 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     /* 按钮系统 */
     .btn {
-      width: 100%;
-      padding: 10px 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
       border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       border: none;
       transition: all 0.2s;
-      margin-top: 8px;
     }
     
-    .btn:active { transform: scale(0.98); }
+    .btn:active { transform: scale(0.97); }
 
     .btn.primary {
       background: var(--accent-color);
       color: white;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
     }
+    .btn.primary:hover { filter: brightness(1.1); }
     
     .btn.secondary {
       background: var(--input-bg);
       color: var(--text-primary);
       border: 1px solid var(--input-border);
     }
-
-    .btn.success {
-      background: var(--success-color);
-      color: white;
-    }
+    .btn.secondary:hover { background: rgba(128,128,128,0.1); }
 
     .btn.danger {
       background: rgba(255, 59, 48, 0.1);
       color: var(--danger-color);
-      border: 1px solid rgba(255, 59, 48, 0.2);
     }
-    .btn.danger:hover {
-      background: var(--danger-color);
-      color: white;
-    }
+    .btn.danger:hover { background: var(--danger-color); color: white; }
 
-    /* 域名列表 */
-    .domain-list-container {
+    .btn.block { width: 100%; margin-top: 8px; padding: 10px; }
+
+    /* 域名列表卡片 */
+    .domain-card {
       background: var(--input-bg);
       border-radius: 12px;
-      padding: 8px;
-      min-height: 200px;
-      margin-bottom: 20px;
       border: 1px solid var(--input-border);
+      padding: 4px;
+      min-height: 200px;
+      margin-bottom: 30px;
     }
 
     .domain-item {
@@ -253,291 +271,241 @@
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px;
+      margin-bottom: 2px;
       border-radius: 8px;
-      margin-bottom: 4px;
-      background: transparent;
       transition: background 0.2s;
     }
+    .domain-item:hover { background: rgba(128,128,128,0.08); }
     
-    .domain-item:hover {
-      background: rgba(128, 128, 128, 0.1);
+    .status-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-left: 10px;
     }
+    .tag-active { background: rgba(52, 199, 89, 0.2); color: var(--success-color); }
+    .tag-pending { background: rgba(255, 159, 10, 0.2); color: #FF9F0A; }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 8px;
+    /* 操作区网格 */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
     }
-    .active .status-dot { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
-    .pending .status-dot { background: #FF9F0A; }
-
-    .domain-actions button {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: transparent;
-      border: 1px solid var(--input-border);
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-    .domain-actions button:hover {
+    
+    .action-box {
       background: var(--input-bg);
-      color: var(--danger-color);
+      border: 1px solid var(--input-border);
+      padding: 16px;
+      border-radius: 12px;
     }
 
-    /* 日志终端 */
-    .terminal-card {
+    .input-row { display: flex; gap: 8px; margin-top: 8px; }
+
+    /* 日志区 */
+    .terminal {
       background: #1e1e1e;
-      border-radius: 12px;
-      padding: 20px;
-      color: #00ff00;
+      color: #27c93f;
+      padding: 16px;
+      border-radius: 10px;
       font-family: 'Menlo', monospace;
       font-size: 12px;
-      height: 150px;
+      line-height: 1.5;
+      height: 120px;
       overflow-y: auto;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(0,0,0,0.1);
     }
 
-    /* 登录遮罩 */
+    /* 登录覆盖层 */
     .login-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: inherit; /* 继承 body 背景 */
+      background: var(--bg-gradient);
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(20px);
     }
     
-    .login-box {
-      width: 360px;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(50px);
-      padding: 40px;
+    .login-card {
+      width: 320px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(40px);
+      padding: 32px;
       border-radius: 24px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
       text-align: center;
-      border: 1px solid rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    [data-theme="dark"] .login-box {
-      background: rgba(30,30,30,0.7);
-      border-color: rgba(255,255,255,0.1);
-    }
+    [data-theme="dark"] .login-card { background: rgba(40, 40, 40, 0.6); border-color: rgba(255,255,255,0.05); }
+
+    .hidden { display: none !important; }
+    .shake { animation: shake 0.4s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 
     /* Toast */
-    .toast-container {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 200;
-    }
     .toast {
-      background: var(--glass-content);
-      backdrop-filter: blur(20px);
-      padding: 16px 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 500;
+      position: fixed;
+      top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+      background: rgba(30,30,30,0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
       font-size: 14px;
-      border: 1px solid var(--glass-border);
-      transform: translateX(120%);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-    .toast.show { transform: translateX(0); }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     /* 移动端适配 */
     @media (max-width: 768px) {
-      .app-window {
-        flex-direction: column;
-        height: 100vh;
-        width: 100%;
-        border-radius: 0;
-        max-height: none;
-      }
-      .sidebar {
-        width: 100%;
-        height: auto;
-        max-height: 40vh;
-        border-right: none;
-        border-bottom: 1px solid var(--glass-border);
-      }
-      .content-area {
-        padding: 20px;
-      }
-    }
-    
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    
-    .hidden { display: none !important; }
-    .shake { animation: shake 0.4s ease-in-out; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+      .app-window { flex-direction: column; width: 100%; height: 100%; border-radius: 0; border: none; }
+      .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 20px; }
+      .content-area { padding: 20px; }
+      .action-grid { grid-template-columns: 1fr; }
+      .brand-area { margin-bottom: 15px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Toast Notification -->
-  <div class="toast-container">
-    <div id="toast" class="toast">
-      <span id="toastIcon"></span>
-      <span id="toastMsg"></span>
-    </div>
-  </div>
+  <div id="toast" class="toast">Message</div>
 
   <!-- 登录界面 -->
   <div id="loginScreen" class="login-overlay">
-    <div class="login-box">
-      <img src="https://image.hyeri.us.kg/icon.png" style="width:80px; height:80px; border-radius:18px; margin-bottom:20px; box-shadow:0 10px 20px rgba(0,0,0,0.2);">
-      <h2 style="margin:0 0 10px; font-weight:700;">Console</h2>
-      <p style="color:var(--text-secondary); font-size:14px; margin:0 0 24px;">Authentication Required</p>
-      
-      <input type="password" id="loginPassword" placeholder="Enter Password" style="text-align:center; padding:14px;">
-      <div id="errorMsg" style="color:var(--danger-color); font-size:12px; margin-bottom:12px; opacity:0; transition:opacity 0.2s;">Invalid Password</div>
-      <button class="btn primary" id="loginBtn" style="padding:14px;">Access Dashboard</button>
+    <div class="login-card">
+      <img src="https://image.hyeri.us.kg/icon.png" style="width:72px; height:72px; border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.15); margin-bottom:20px;">
+      <h3 style="margin:0 0 8px;">Welcome Back</h3>
+      <p style="color:var(--text-secondary); font-size:13px; margin:0 0 24px;">Please authenticate to continue</p>
+      <input type="password" id="loginPassword" placeholder="Password" style="text-align:center; margin-bottom:16px;">
+      <button id="loginBtn" class="btn primary block" style="height:40px;">Unlock</button>
+      <div id="errorMsg" style="color:var(--danger-color); font-size:12px; margin-top:10px; opacity:0;">Incorrect Password</div>
     </div>
   </div>
 
-  <!-- 主应用窗口 -->
+  <!-- 主界面 -->
   <div id="mainScreen" class="app-window hidden">
     
-    <!-- 左侧边栏：配置与选择 -->
+    <!-- 左侧边栏 (Sidebar) -->
     <div class="sidebar">
-      <div class="app-header">
-        <div class="brand">
-          <img src="https://image.hyeri.us.kg/icon.png">
-          <span>Pages</span>
+      <div class="brand-area">
+        <img src="https://image.hyeri.us.kg/icon.png" class="brand-icon">
+        <div class="brand-text">Console</div>
+      </div>
+
+      <div style="flex:1; overflow-y:auto;">
+        <div class="control-group">
+          <label>ACCOUNT ID</label>
+          <input id="accountId" placeholder="Account ID" />
         </div>
-        <button class="theme-btn" id="themeToggle">☀️</button>
+        <div class="control-group">
+          <label>PAGES TOKEN</label>
+          <input id="pagesToken" type="password" placeholder="API Token" />
+        </div>
+        <div class="control-group">
+          <label>ZONE TOKEN</label>
+          <input id="zoneToken" type="password" placeholder="API Token" />
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button id="loadConfigBtn" class="btn secondary" style="flex:1;">Load</button>
+          <button id="saveConfigBtn" class="btn primary" style="flex:1;">Save</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--glass-border); margin:24px 0;">
+
+        <div class="control-group">
+          <label>SELECT PROJECT</label>
+          <select id="projectSelect"><option value="">-- Select --</option></select>
+          <button id="loadProjectsBtn" class="btn secondary block">Fetch Projects</button>
+        </div>
       </div>
 
-      <div class="section-title">Configuration</div>
-      <label>Account ID</label>
-      <input id="accountId" placeholder="ID..." />
-      
-      <label>Pages Token</label>
-      <input id="pagesToken" type="password" placeholder="Token..." />
-      
-      <label>Zone Token</label>
-      <input id="zoneToken" type="password" placeholder="Token..." />
-      
-      <div style="display:flex; gap:10px; margin-bottom:30px;">
-        <button class="btn secondary" id="loadConfigBtn">Load</button>
-        <button class="btn primary" id="saveConfigBtn">Save</button>
+      <div class="sidebar-footer">
+        <span style="font-size:12px; color:var(--text-secondary);">v2.0.1 Stable</span>
+        <button id="themeToggle" class="theme-btn">◑</button>
       </div>
-
-      <div class="section-title">Projects</div>
-      <select id="projectSelect">
-        <option value="">Select Project...</option>
-      </select>
-      <button class="btn secondary" id="loadProjectsBtn">Fetch Projects</button>
     </div>
 
-    <!-- 右侧内容区：管理与日志 -->
+    <!-- 右侧内容 (Content) -->
     <div class="content-area">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0; font-size:24px;">Domains</h2>
-        <button class="btn secondary" id="refreshDomainsBtn" style="width:auto;">Refresh</button>
+      <div class="content-header">
+        <h2>Domain Manager</h2>
+        <button id="refreshDomainsBtn" class="btn secondary">Refresh List</button>
       </div>
 
-      <div id="domainList" class="domain-list-container">
-        <div style="display:flex; height:100%; align-items:center; justify-content:center; color:var(--text-secondary); min-height:180px;">
-          No domains loaded
+      <div id="domainList" class="domain-card">
+        <div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--text-secondary); min-height:190px;">
+          Waiting for project selection...
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
-        <div>
-          <label>Add Custom Domain (Auto DNS)</label>
-          <div style="display:flex; gap:8px;">
-            <input id="addDomainInput" placeholder="e.g. blog.example.com" style="margin:0;" />
-            <button class="btn success" id="addDomainBtn" style="width:auto; margin:0;">Add</button>
+      <div class="action-grid">
+        <div class="action-box">
+          <label style="color:var(--accent-color);">ADD DOMAIN (AUTO DNS)</label>
+          <div class="input-row">
+            <input id="addDomainInput" placeholder="sub.example.com" />
+            <button id="addDomainBtn" class="btn primary">Add</button>
           </div>
         </div>
-        <div>
-          <label>Delete Domain</label>
-          <div style="display:flex; gap:8px;">
-            <input id="removeDomainInput" placeholder="Domain to remove" style="margin:0;" />
-            <button class="btn danger" id="removeDomainBtn" style="width:auto; margin:0;">Delete</button>
+        <div class="action-box">
+          <label style="color:var(--danger-color);">REMOVE DOMAIN</label>
+          <div class="input-row">
+            <input id="removeDomainInput" placeholder="Domain to remove" />
+            <button id="removeDomainBtn" class="btn danger">Remove</button>
           </div>
         </div>
       </div>
 
-      <div class="section-title">System Log</div>
-      <div id="output" class="terminal-card">Ready...</div>
+      <label>TERMINAL OUTPUT</label>
+      <div id="output" class="terminal">System ready. Waiting for user input...</div>
     </div>
-
   </div>
 
   <script>
-    // --- UI Interactions ---
-    
-    // Theme Toggle
+    // UI 交互逻辑
     const themeToggle = document.getElementById('themeToggle');
-    const htmlEl = document.documentElement;
-    themeToggle.addEventListener('click', () => {
-      const current = htmlEl.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
-      htmlEl.setAttribute('data-theme', next);
-      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
-    });
-
-    // Toast System
-    const toastEl = document.getElementById('toast');
-    const toastIcon = document.getElementById('toastIcon');
-    const toastMsg = document.getElementById('toastMsg');
+    const html = document.documentElement;
+    const toast = document.getElementById('toast');
     let toastTimer;
 
-    function showToast(message, type = 'info') {
+    // 主题切换
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Toast 提示
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
       clearTimeout(toastTimer);
-      toastMsg.textContent = message;
-      
-      if(type === 'success') toastIcon.innerHTML = '✅';
-      else if(type === 'error') toastIcon.innerHTML = '⛔';
-      else toastIcon.innerHTML = 'ℹ️';
-
-      toastEl.classList.add('show');
-      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Login Animation
-    const loginBox = document.querySelector('.login-box');
-    const loginError = document.getElementById('errorMsg');
-    
-    function triggerLoginError() {
-      loginError.style.opacity = '1';
-      loginBox.classList.remove('shake');
-      void loginBox.offsetWidth;
-      loginBox.classList.add('shake');
+    // 登录错误动画
+    function triggerError() {
+      const err = document.getElementById('errorMsg');
+      const card = document.querySelector('.login-card');
+      err.style.opacity = 1;
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
     }
 
-    // --- Core Logic (Identical to original) ---
-    
+    // --- 核心业务逻辑 (保持完全一致) ---
     const loginScreen=document.getElementById('loginScreen');
     const mainScreen=document.getElementById('mainScreen');
     const loginPassword=document.getElementById('loginPassword');
     const loginBtn=document.getElementById('loginBtn');
-    // errorMsg is handled above
 
     async function checkLogin(){
       const password=loginPassword.value.trim();
-      if(!password){
-        triggerLoginError();
-        return;
-      }
+      if(!password) return triggerError();
       try{
         const resp=await fetch('/api/auth',{
           method:'POST',
@@ -548,16 +516,12 @@
         if(data.success){
           sessionStorage.setItem('authenticated','true');
           showMainScreen();
-        }else{
-          triggerLoginError();
-        }
-      }catch(e){
-        triggerLoginError();
-      }
+        }else{ triggerError(); }
+      }catch(e){ triggerError(); }
     }
 
     function showMainScreen(){
-      loginScreen.style.opacity = '0';
+      loginScreen.style.opacity = 0;
       setTimeout(() => {
         loginScreen.classList.add('hidden');
         mainScreen.classList.remove('hidden');
@@ -566,9 +530,7 @@
     }
 
     loginBtn.addEventListener('click',checkLogin);
-    loginPassword.addEventListener('keypress',e=>{
-      if(e.key==='Enter')checkLogin();
-    });
+    loginPassword.addEventListener('keypress',e=>{if(e.key==='Enter')checkLogin();});
 
     if(sessionStorage.getItem('authenticated')==='true'){
       loginScreen.classList.add('hidden');
@@ -576,8 +538,7 @@
       loadConfig();
     }
 
-    // --- Business Logic ---
-
+    // 变量声明
     const accountId=document.getElementById('accountId');
     const pagesToken=document.getElementById('pagesToken');
     const zoneToken=document.getElementById('zoneToken');
@@ -594,7 +555,7 @@
     const output=document.getElementById('output');
 
     async function apiCall(path,method='GET',body=null){
-      output.innerHTML += `<div>> Req: ${method} ${path}</div>`;
+      output.innerHTML += `<div>> ${method} ${path}...</div>`;
       output.scrollTop = output.scrollHeight;
       try{
         const resp=await fetch(path,{
@@ -607,37 +568,22 @@
           },
           body:body?JSON.stringify(body):null
         });
-        const data=await resp.json().catch(()=>({error:'Invalid JSON response'}));
-        output.innerHTML += `<div style="color:${resp.ok?'var(--success-color)':'var(--danger-color)'}">> Resp: ${data.success?'OK':'FAIL'}</div>`;
+        const data=await resp.json().catch(()=>({error:'Invalid Response'}));
+        output.innerHTML += `<div style="color:${resp.ok?'#4cd964':'#ff3b30'}">> Result: ${data.success?'Success':'Fail'}</div>`;
         output.scrollTop = output.scrollHeight;
         return{ok:resp.ok,data};
       }catch(e){
-        output.innerHTML += `<div style="color:var(--danger-color)">> Error: ${e.message}</div>`;
+        output.innerHTML += `<div style="color:#ff3b30">> Error: ${e.message}</div>`;
         return{ok:false,data:null};
       }
     }
 
     async function saveConfig(){
-      const config={
-        accountId:accountId.value.trim(),
-        pagesToken:pagesToken.value.trim(),
-        zoneToken:zoneToken.value.trim()
-      };
-      if(!config.accountId||!config.pagesToken||!config.zoneToken){
-        showToast('Please fill in all fields', 'error');
-        return;
-      }
-      const res=await fetch('/api/config',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(config)
-      });
+      const config={accountId:accountId.value.trim(),pagesToken:pagesToken.value.trim(),zoneToken:zoneToken.value.trim()};
+      if(!config.accountId||!config.pagesToken||!config.zoneToken) return showToast('Please fill all fields');
+      const res=await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});
       const data=await res.json();
-      if(data.success){
-        showToast('Config Saved', 'success');
-      }else{
-        showToast('Save Failed', 'error');
-      }
+      showToast(data.success?'Configuration Saved':'Save Failed');
     }
 
     async function loadConfig(){
@@ -647,16 +593,97 @@
         accountId.value=data.config.accountId||'';
         pagesToken.value=data.config.pagesToken||'';
         zoneToken.value=data.config.zoneToken||'';
-        output.innerHTML += `<div>> Config loaded from cloud</div>`;
+        output.innerHTML += `<div>> Config loaded from server</div>`;
       }
     }
 
     async function loadProjects(){
       const acc=accountId.value.trim();
-      if(!acc||!pagesToken.value.trim()) return showToast('Missing Account ID or Token', 'error');
+      if(!acc||!pagesToken.value.trim()) return showToast('Missing Credentials');
       const res=await apiCall(`/api/accounts/${encodeURIComponent(acc)}/projects`);
       if(res.ok&&res.data.success){
         const projects=res.data.result||[];
         projectSelect.innerHTML=projects.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
         if(projects.length>0){
-          proj
+          projectSelect.value=projects[0].name;
+          await loadDomains();
+        }
+      }
+    }
+
+    async function loadDomains(){
+      const acc=accountId.value.trim();
+      const proj=projectSelect.value;
+      if(!acc||!proj)return;
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(acc)}/projects/${encodeURIComponent(proj)}/domains`);
+      domainList.innerHTML='';
+      if(res.ok&&res.data.success){
+        const domains=res.data.result||[];
+        if(domains.length===0){
+          domainList.innerHTML='<div style="display:flex;height:100%;align-items:center;justify-content:center;color:var(--text-secondary);">No domains found</div>';
+        }else{
+          domains.forEach(d=>{
+            const isAct = d.status==='active';
+            const el=document.createElement('div');
+            el.className='domain-item';
+            el.innerHTML=`
+              <div style="display:flex;align-items:center;">
+                <span style="font-weight:500">${d.name}</span>
+                <span class="status-tag ${isAct?'tag-active':'tag-pending'}">${isAct?'Active':'Verifying'}</span>
+              </div>
+              <button class="btn secondary" style="padding:4px 10px;font-size:12px;" onclick="confirmAndRemove('${encodeURIComponent(d.name)}')">Disconnect</button>
+            `;
+            domainList.appendChild(el);
+          });
+        }
+      }
+    }
+
+    window.confirmAndRemove=async function(domainEncoded){
+      const domain=decodeURIComponent(domainEncoded);
+      if(!confirm(`Delete domain ${domain}?`))return;
+      const acc=accountId.value.trim();
+      const proj=projectSelect.value;
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(acc)}/projects/${encodeURIComponent(proj)}/domains/${domain}`,'DELETE');
+      if(res.ok&&res.data.success){
+        await loadDomains();
+        showToast('Domain removed');
+      } else {
+        showToast('Remove failed');
+      }
+    };
+
+    addDomainBtn.addEventListener('click',async()=>{
+      const acc=accountId.value.trim();
+      const proj=projectSelect.value;
+      const domain=addDomainInput.value.trim();
+      if(!acc||!proj||!domain) return showToast('Check Inputs');
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(acc)}/projects/${encodeURIComponent(proj)}/domains`,'POST',{name:domain});
+      if(res.ok&&res.data.success){
+        addDomainInput.value='';
+        await loadDomains();
+        showToast(res.data.dns_created?'Domain & DNS Created':'Domain Added');
+      } else { showToast('Add Failed'); }
+    });
+
+    removeDomainBtn.addEventListener('click',async()=>{
+      const acc=accountId.value.trim();
+      const proj=projectSelect.value;
+      const domain=removeDomainInput.value.trim();
+      if(!acc||!proj||!domain) return showToast('Input Domain');
+      const res=await apiCall(`/api/accounts/${encodeURIComponent(acc)}/projects/${encodeURIComponent(proj)}/domains/${domain}`,'DELETE');
+      if(res.ok&&res.data.success){
+        removeDomainInput.value='';
+        await loadDomains();
+        showToast('Domain Deleted');
+      } else { showToast('Delete Failed'); }
+    });
+
+    refreshDomainsBtn.addEventListener('click',() => { loadDomains(); showToast('Refreshed'); });
+    loadProjectsBtn.addEventListener('click',loadProjects);
+    projectSelect.addEventListener('change',loadDomains);
+    saveConfigBtn.addEventListener('click',saveConfig);
+    loadConfigBtn.addEventListener('click',loadConfig);
+  </script>
+</body>
+</html>
